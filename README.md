@@ -10,6 +10,8 @@ docker-compose up --build -d
 
 Access http://localhost:8004
 
+and doc on http://localhost:8004/api-docs
+
 
 ## Baserow
 
