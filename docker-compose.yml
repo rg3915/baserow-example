@@ -1,0 +1,60 @@
+version: "3.8"
+
+services:
+  db:
+    container_name: baserow_db
+    image: postgres:16-alpine
+    restart: always
+    user: postgres
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: baserow_database
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - baserow-network
+
+  baserow:
+    container_name: baserow
+    image: baserow/baserow
+    environment:
+      BASEROW_PUBLIC_URL: 'http://localhost:8004'
+      DATABASE_HOST: db
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: postgres
+      DATABASE_NAME: baserow_database
+    ports:
+      - "8004:80"
+      - "443:443"
+    depends_on:
+      - db
+    volumes:
+      - baserow_data:/baserow/data
+    networks:
+      - baserow-network
+
+  pgadmin:
+    container_name: baserow_pgadmin
+    image: dpage/pgadmin4
+    restart: unless-stopped
+    volumes:
+       - pgadmin:/var/lib/pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - 5054:80
+    networks:
+      - baserow-network
+
+volumes:
+  baserow_data:
+  pgdata:
+  pgadmin:
+
+networks:
+  baserow-network:
